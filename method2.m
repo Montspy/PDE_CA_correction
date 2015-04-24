@@ -1,7 +1,7 @@
 
 clear
 
-tf = 5;
+tf = 10;
 dt = 0;
 dx = 1;
 
