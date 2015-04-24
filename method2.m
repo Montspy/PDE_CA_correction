@@ -131,8 +131,8 @@ while(t < tf)
             y_off = max(1, min(N, y + round(v(y,x))));
             
             % b, c
-            b(y,x) = -(B(y_off,x_off) - B(y,x))*B_x(y_off, x_off)/255;
-            c(y,x) = -(B(y_off,x_off) - B(y,x))*B_y(y_off, x_off)/255;
+            b(y,x) = -(B(y_off,x_off) - G(y,x))*B_x(y_off, x_off);
+            c(y,x) = -(B(y_off,x_off) - G(y,x))*B_y(y_off, x_off);
         end
     end
     
@@ -155,12 +155,12 @@ while(t < tf)
             u_xx = (u(y, x_p1) - 2*u(y,x) + u(y,x_m1))/(dx^2);
             u_yy = (u(y_p1, x) - 2*u(y,x) + u(y_m1,x))/(dx^2);
             
-            new_u(y,x) = u(y,x) + dt*(b(y,x) + (u_xx + u_yy));
+            new_u(y,x) = u(y,x) + dt*(alpha*b(y,x) + beta*(u_xx + u_yy));
             
             v_xx = (v(y, x_p1) - 2*v(y,x) + v(y,x_m1))/(dx^2);
             v_yy = (v(y_p1, x) - 2*v(y,x) + v(y_m1,x))/(dx^2);
             
-            new_v(y,x) = v(y,x) + dt*(c(y,x) + (v_xx + v_yy));
+            new_v(y,x) = v(y,x) + dt*(alpha*c(y,x) + beta*(v_xx + v_yy));
         end
     end
     u = new_u;
