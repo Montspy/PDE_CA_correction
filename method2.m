@@ -2,7 +2,6 @@
 clear
 
 tf = 1;
-t = 0;
 dt = 0;
 dx = 1;
 
@@ -35,6 +34,7 @@ tt = [];
 tic;
 
 %% Red
+t = 0;
 while(t < tf)
     % Compute b(x,y) and c(x,y)
     for x = 1:M
@@ -111,6 +111,7 @@ for x = 1:M
 end
 
 %% Blue
+t = 0;
 
 while(t < tf)
     % Compute b(x,y) and c(x,y)
@@ -171,7 +172,7 @@ while(t < tf)
     u = new_u;
     v = new_v;
     
-    E = [E, energy2(B, G, u, v, dx)];
+    E = [E, energy2(B, G, u, v, dx, alpha, beta)];
     t = t + dt;
     tt = [tt t];
 end
