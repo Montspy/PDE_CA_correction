@@ -1,7 +1,7 @@
 
 clear
 
-tf = 1;
+tf = 5;
 dt = 0;
 dx = 1;
 
@@ -10,7 +10,7 @@ R = double(I(:,:,1))/255;
 G = double(I(:,:,2))/255;
 B = double(I(:,:,3))/255;
 
-alpha = 200;
+alpha = 100;
 beta = 1;
 
 S = size(R);
@@ -23,6 +23,8 @@ title('Original image');
 
 b = zeros(size(R)); % b = -(R - G)*R_x
 c = zeros(size(R)); % c = -(R - G)*R_y
+
+react = zeros(2, 2);  % 2x2 matrix for each pixel
 
 R_x = zeros(size(R));
 R_y = zeros(size(R));
@@ -57,7 +59,9 @@ tt = [];
 t = 0;
 
 while(t < tf)
+    t
     % Compute b(x,y) and c(x,y)
+    dt = 2;
     for x = 1:M
         for y = 1:N
             x_off = max(1, min(M, x + round(u(y,x))));
@@ -66,14 +70,20 @@ while(t < tf)
             % b, c
             b(y,x) = -(R(y_off,x_off) - G(y,x))*R_x(y_off, x_off);
             c(y,x) = -(R(y_off,x_off) - G(y,x))*R_y(y_off, x_off);
+            
+            react = [R_x(y,x)*R_x(y_off,x_off), R_y(y,x)*R_x(y_off,x_off); R_x(y,x)*R_y(y_off,x_off), R_y(y,x)*R_y(y_off,x_off)];
+            e = alpha*eig(react);
+            e1 = min(e);    % Most negative eigenvalue
+            if(e1 > 0)  % Both eigenvalues are positives, unstable for the reaction term?
+                dt = min(dt, 2);
+            else        % Otherwise, keep the most constraining dt
+                dt = min(dt, 2/(alpha*abs(e1)));
+            end
         end
     end
     
     % Compute maximum dt
-    dt = dx^2/4;            % Heat equation for u
-    dt = min(dt, dx^2/4);   % Heat equation for v
-    
-    dt = dt/2;
+    dt = min(dt, dx^2/(4*beta));   % Heat equation for u and v
     
     new_u = zeros(size(u));
     new_v = zeros(size(v));
@@ -124,7 +134,9 @@ tt = [];
 t = 0;
 
 while(t < tf)
+    t
     % Compute b(x,y) and c(x,y)
+    dt = 2;
     for x = 1:M
         for y = 1:N
             x_off = max(1, min(M, x + round(u(y,x))));
@@ -133,12 +145,20 @@ while(t < tf)
             % b, c
             b(y,x) = -(B(y_off,x_off) - G(y,x))*B_x(y_off, x_off);
             c(y,x) = -(B(y_off,x_off) - G(y,x))*B_y(y_off, x_off);
+            
+            react = [B_x(y,x)*B_x(y_off,x_off), B_y(y,x)*B_x(y_off,x_off); B_x(y,x)*B_y(y_off,x_off), B_y(y,x)*B_y(y_off,x_off)];
+            e = alpha*eig(react);
+            e1 = min(e);    % Most negative eigenvalue
+            if(e1 > 0)  % Both eigenvalues are positives, unstable for the reaction term?
+                dt = min(dt, 2);
+            else        % Otherwise, keep the most constraining dt
+                dt = min(dt, 2/(alpha*abs(e1)));
+            end
         end
     end
     
     % Compute maximum dt
-    dt = dx^2/4;            % Heat equation for u
-    dt = min(dt, dx^2/4);   % Heat equation for v
+    dt = min(dt, dx^2/(4*beta));   % Heat equation for u and v
     
     dt = dt/2;
     
