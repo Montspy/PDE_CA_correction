@@ -21,20 +21,41 @@ figure(1);
 image(double(I)/255);
 title('Original image');
 
-    % x and y offset
-u = zeros(size(R));
-v = zeros(size(R));
-
 b = zeros(size(R)); % b = -(R - G)*R_x
 c = zeros(size(R)); % c = -(R - G)*R_y
 
-E = [];
-tt = [];
+R_x = zeros(size(R));
+R_y = zeros(size(R));
+B_x = zeros(size(R));
+B_y = zeros(size(R));
 
 tic;
 
+%% Data preparation
+for x = 1:M
+    for y = 1:N
+        x_p1 = min(M, x+1);
+        x_m1 = max(1, x-1);
+        y_p1 = min(N, y+1);
+        y_m1 = max(1, y-1);
+        
+        % Spatial derivatives (centered)
+        R_x(y,x) = (R(y, x_p1) - R(y, x_m1))/(2*dx);
+        R_y(y,x) = (R(y_p1, x) - R(y_m1, x))/(2*dx);
+        
+        B_x(y,x) = (B(y, x_p1) - B(y, x_m1))/(2*dx);
+        B_y(y,x) = (B(y_p1, x) - B(y_m1, x))/(2*dx);
+    end
+end
+
 %% Red
+u = zeros(size(R));
+v = zeros(size(R));
+
+E = [];
+tt = [];
 t = 0;
+
 while(t < tf)
     % Compute b(x,y) and c(x,y)
     for x = 1:M
@@ -42,25 +63,9 @@ while(t < tf)
             x_off = max(1, min(M, x + round(u(y,x))));
             y_off = max(1, min(N, y + round(v(y,x))));
             
-            % Limit indexes
-            x_off_p1 = max(1, min(M, x+1 + round(u(y,x))));
-            x_off_m1 = max(1, min(M, x-1 + round(u(y,x))));
-            y_off_p1 = max(1, min(N, y+1 + round(v(y,x))));
-            y_off_m1 = max(1, min(N, y-1 + round(v(y,x))));
-            
-            x_p1 = min(M, x+1);
-            x_m1 = max(1, x-1);
-            y_p1 = min(N, y+1);
-            y_m1 = max(1, y-1);
-            
-            % Spatial derivatives (centered)
-            R_x = (R(y_off, x_off_p1) - R(y_off, x_off_m1))/(2*dx);
-
-            R_y = (R(y_off_p1, x_off) - R(y_off_m1, x_off))/(2*dx);
-            
             % b, c
-            b(y,x) = -(R(y_off,x_off) - G(y,x))*R_x;
-            c(y,x) = -(R(y_off,x_off) - G(y,x))*R_y;
+            b(y,x) = -(R(y_off,x_off) - G(y,x))*R_x(y_off, x_off);
+            c(y,x) = -(R(y_off,x_off) - G(y,x))*R_y(y_off, x_off);
         end
     end
     
@@ -111,6 +116,11 @@ for x = 1:M
 end
 
 %% Blue
+u = zeros(size(R));
+v = zeros(size(R));
+
+E = [];
+tt = [];
 t = 0;
 
 while(t < tf)
@@ -120,25 +130,9 @@ while(t < tf)
             x_off = max(1, min(M, x + round(u(y,x))));
             y_off = max(1, min(N, y + round(v(y,x))));
             
-            % Limit indexes
-            x_off_p1 = max(1, min(M, x+1 + round(u(y,x))));
-            x_off_m1 = max(1, min(M, x-1 + round(u(y,x))));
-            y_off_p1 = max(1, min(N, y+1 + round(v(y,x))));
-            y_off_m1 = max(1, min(N, y-1 + round(v(y,x))));
-            
-            x_p1 = min(M, x+1);
-            x_m1 = max(1, x-1);
-            y_p1 = min(N, y+1);
-            y_m1 = max(1, y-1);
-            
-            % Spatial derivatives (centered)
-            B_x = (B(y_off, x_off_p1) - B(y_off, x_off_m1))/(2*dx);
-
-            B_y = (B(y_off_p1, x_off) - B(y_off_m1, x_off))/(2*dx);
-            
             % b, c
-            b(y,x) = -(B(y_off,x_off) - B(y,x))*B_x/255;
-            c(y,x) = -(B(y_off,x_off) - B(y,x))*B_y/255;
+            b(y,x) = -(B(y_off,x_off) - B(y,x))*B_x(y_off, x_off)/255;
+            c(y,x) = -(B(y_off,x_off) - B(y,x))*B_y(y_off, x_off)/255;
         end
     end
     
