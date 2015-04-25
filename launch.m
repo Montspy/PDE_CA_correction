@@ -2,10 +2,10 @@
 clear
 close all
 
-alphas = [40    , 100   , 100   , 100   , 100];
-betas =  [1     , 1     , 0.5   , 2     , 1];
-tfs =    [1     , 5     , 1     , 1     , 1];
-filenames = {'axial_numbers'; 'axial_numbers'; 'axial_numbers'; 'axial_numbers'; 'longi_checkerboard_800'};
+alphas = [50];
+betas =  [0.5];
+tfs =    [20];
+filenames = {'wood'};
 
 for i = 1:length(alphas)
 	a = alphas(i);

@@ -42,8 +42,8 @@ function [J, tt, E] = method2_fun(alpha, beta, tf, filename)
 	end
 
 	%% Red
-	u = zeros(size(R));
-	v = zeros(size(R));
+	u = 0*ones(size(R));
+	v = 0*ones(size(R));
 
 	E = [];
 	tt = [];
@@ -117,8 +117,8 @@ function [J, tt, E] = method2_fun(alpha, beta, tf, filename)
 	end
 
 	%% Blue
-	u = zeros(size(R));
-	v = zeros(size(R));
+	u = 0*ones(size(R));
+	v = 0*ones(size(R));
 
 	E = [];
 	tt = [];
